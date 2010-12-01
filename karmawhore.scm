@@ -19,6 +19,13 @@
 
 (use-modules (ice-9 rdelim) (ice-9 regex) (ice-9 format))
 
+;; according to ircd-seven everything between ASCII 64 and 128 is valid
+;; I just take a subset of that. The nick has to be between 1 and 16 characters
+;; (seven supports 16 as default, maximum 50)
+(define allowed-nickname "[A-~]{1,16}")
+(define nick-plus (make-regexp (format "(~a)\\+\\+" allowed-nickname)))
+(define nick-minus (make-regexp (format "(~a)\\-\\-" allowed-nickname)))
+
 (define hash (make-hash-table))
 
 (define extract-nicks
@@ -38,8 +45,6 @@
       (if (not current-value) (hash-set! hash nick -1)
           (hash-set! hash nick (- current-value 1))))))
 
-(define nick-plus (make-regexp "(\\S*)\\+\\+"))
-(define nick-minus (make-regexp "(\\S*)\\-\\-"))
 
 (define parse-line
   (lambda (line)
