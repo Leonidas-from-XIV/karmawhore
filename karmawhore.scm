@@ -17,7 +17,7 @@
 ;;; You should have received a copy of the GNU General Public License
 ;;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(use-modules (ice-9 rdelim) (ice-9 regex) (ice-9 format))
+(use-modules (ice-9 rdelim) (ice-9 regex) (ice-9 format) (srfi srfi-39))
 
 ;; according to ircd-seven everything between ASCII 64 and 128 is valid
 ;; I just take a subset of that. The nick has to be between 1 and 16 characters
@@ -26,7 +26,7 @@
 (define nick-plus (make-regexp (format "(~a)\\+\\+" allowed-nickname)))
 (define nick-minus (make-regexp (format "(~a)\\-\\-" allowed-nickname)))
 
-(define hash (make-hash-table))
+(define hash (make-parameter 'dummy))
 
 (define extract-nicks
   (lambda (regexp line)
@@ -50,8 +50,8 @@
   (lambda (line)
     (let ((nicks-add (extract-nicks nick-plus line))
           (nicks-sub (extract-nicks nick-minus line)))
-      (map (lambda (nick) (hash-inc hash nick)) nicks-add)
-      (map (lambda (nick) (hash-dec hash nick)) nicks-sub))))
+      (map (lambda (nick) (hash-inc (hash) nick)) nicks-add)
+      (map (lambda (nick) (hash-dec (hash) nick)) nicks-sub))))
 
 (define handler
   (lambda ()
@@ -75,5 +75,6 @@
 
 (define main
   (lambda (args)
-    (with-input-from-file "intum.log" handler)
-    (print-results (order-by-karma (histogram->list hash)))))
+    (parameterize ((hash (make-hash-table)))
+      (with-input-from-file "intum.log" handler)
+      (print-results (order-by-karma (histogram->list (hash)))))))
