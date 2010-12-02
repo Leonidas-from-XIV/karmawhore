@@ -33,25 +33,26 @@
     (map (lambda (item) (match:substring item 1))
          (list-matches regexp line))))
 
-(define hash-inc
-  (lambda (hash nick)
-    (let ((current-value (hash-ref hash nick)))
-      (if (not current-value) (hash-set! hash nick 1)
-          (hash-set! hash nick (+ current-value 1))))))
+(define increase-karma
+  (lambda (nick)
+    (let* ((data (hash))
+	   (current-value (hash-ref data nick)))
+      (if (not current-value) (hash-set! data nick 1)
+	(hash-set! data nick (+ current-value 1))))))
 
-(define hash-dec
-  (lambda (hash nick)
-    (let ((current-value (hash-ref hash nick)))
-      (if (not current-value) (hash-set! hash nick -1)
-          (hash-set! hash nick (- current-value 1))))))
-
+(define decrease-karma
+  (lambda (nick)
+    (let* ((data (hash))
+	   (current-value (hash-ref data nick)))
+      (if (not current-value) (hash-set! data nick -1)
+	(hash-set! data nick (- current-value 1))))))
 
 (define parse-line
   (lambda (line)
     (let ((nicks-add (extract-nicks nick-plus line))
           (nicks-sub (extract-nicks nick-minus line)))
-      (map (lambda (nick) (hash-inc (hash) nick)) nicks-add)
-      (map (lambda (nick) (hash-dec (hash) nick)) nicks-sub))))
+      (map increase-karma nicks-add)
+      (map decrease-karma nicks-sub))))
 
 (define handler
   (lambda ()
