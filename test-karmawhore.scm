@@ -20,3 +20,7 @@
 (use-modules (unit-test)
 	     (karmalib))
 
+(define (test-nick-clean-underscore)
+  (assert-true #t))
+
+(exit-with-summary (run-all-defined-test-cases))
