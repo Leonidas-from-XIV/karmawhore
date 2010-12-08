@@ -17,11 +17,6 @@
 ;;; You should have received a copy of the GNU Affero General Public License
 ;;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(use-modules (karmalib)
-  (srfi srfi-39))
+(use-modules (unit-test)
+	     (karmalib))
 
-(define main
-  (lambda (args)
-    (parameterize ((histogram (make-hash-table)))
-      (with-input-from-file "intum.log" handler)
-      (print-results (order-by-karma (histogram->list (histogram)))))))
