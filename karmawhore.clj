@@ -22,8 +22,9 @@
 (def nick-plus (re-pattern (format "(%s)\\+\\+" allowed-nickname)))
 (def nick-minus (re-pattern (format "(%s)\\-\\-" allowed-nickname)))
 
-(defn extract-nicks [regexp line]
-  (map second (re-seq regexp line)))
+(defn get-votes [regexp line]
+  (let [nicks (map second (re-seq regexp line))]
+    (frequencies nicks)))
 
 (defn modify-karma [op h nick]
   (let [current-value (h nick)]
@@ -33,15 +34,15 @@
 (def increase-karma (partial modify-karma +))
 (def decrease-karma (partial modify-karma -))
 
-(defn process-line [acc line]
-  (let [nicks-add (extract-nicks nick-plus line)
-        nicks-sub (extract-nicks nick-minus line)
-        after-add (reduce increase-karma acc nicks-add)]
-    (reduce decrease-karma after-add nicks-sub)))
+(defn get-histogram [line]
+  (let [upvotes (get-votes nick-plus line)
+        downvotes (get-votes nick-minus line)]
+    (merge-with - upvotes downvotes)))
 
 (defn -main [& args]
-  (let [file-name (first (first args))
-        histogram (reduce process-line (hash-map) (read-lines file-name))
+  (let [file-name (ffirst args)
+        histograms (map get-histogram (read-lines file-name))
+        histogram (apply merge-with + histograms)
         nonzero? (comp not zero? second)
         histogram (filter nonzero? histogram)
         sorted-by-karma (sort-by #(- (second %)) histogram)]
