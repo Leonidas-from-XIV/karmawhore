@@ -26,14 +26,6 @@
   (let [nicks (map second (re-seq regexp line))]
     (frequencies nicks)))
 
-(defn modify-karma [op h nick]
-  (let [current-value (h nick)]
-    (if (nil? current-value) (assoc h nick (op 1))
-      (assoc h nick (op current-value 1)))))
-
-(def increase-karma (partial modify-karma +))
-(def decrease-karma (partial modify-karma -))
-
 (defn get-histogram [line]
   (let [upvotes (get-votes nick-plus line)
         downvotes (get-votes nick-minus line)]
@@ -43,10 +35,9 @@
   (let [file-name (ffirst args)
         histograms (map get-histogram (read-lines file-name))
         histogram (apply merge-with + histograms)
-        nonzero? (comp not zero? second)
-        histogram (filter nonzero? histogram)
-        sorted-by-karma (sort-by #(- (second %)) histogram)]
-    (doseq [item sorted-by-karma]
-      (printf "%s %d\n" (first item) (second item)))))
+        histogram (remove (comp zero? second) histogram)
+        sorted-by-karma (reverse (sort-by second histogram))]
+    (doseq [[nick karma] sorted-by-karma]
+      (println nick karma))))
 
 (-main *command-line-args*)
