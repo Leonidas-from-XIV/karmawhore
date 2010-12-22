@@ -16,7 +16,8 @@
 
 (ns net.xivilization.karmawhore
   (:gen-class)
-  (:use [clojure.contrib.duck-streams :only (read-lines)]))
+  (:use [clojure.contrib.duck-streams :only (read-lines)])
+  (:use [clojure.contrib.generic.functor :only (fmap)]))
 
 (def allowed-nickname "[A-z]{1,16}")
 (def nick-plus (re-pattern (format "(%s)\\+\\+" allowed-nickname)))
@@ -28,8 +29,8 @@
 
 (defn get-histogram [line]
   (let [upvotes (get-votes nick-plus line)
-        downvotes (get-votes nick-minus line)]
-    (merge-with - upvotes downvotes)))
+        downvotes (fmap - (get-votes nick-minus line))]
+    (merge-with + upvotes downvotes)))
 
 (defn -main [& args]
   (let [file-name (ffirst args)
