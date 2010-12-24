@@ -33,7 +33,7 @@
     (merge-with + upvotes downvotes)))
 
 (defn -main [& args]
-  (let [file-name (ffirst args)
+  (let [file-name (first args)
         histograms (map get-histogram (read-lines file-name))
         histogram (apply merge-with + histograms)
         histogram (remove (comp zero? second) histogram)

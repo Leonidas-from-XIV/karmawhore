@@ -2,7 +2,7 @@
 
 Usage:
 
-    $ clj karmawhore.clj your-log.file
+    $ lein run -m karmawhore your-log.file
 
 It generates the histogram to stdout.
 
