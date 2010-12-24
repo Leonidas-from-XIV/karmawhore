@@ -14,7 +14,7 @@
 ;;; You should have received a copy of the GNU Affero General Public License
 ;;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns net.xivilization.karmawhore
+(ns karmawhore
   (:gen-class)
   (:use [clojure.contrib.duck-streams :only (read-lines)])
   (:use [clojure.contrib.generic.functor :only (fmap)]))
@@ -40,5 +40,3 @@
         sorted-by-karma (reverse (sort-by second histogram))]
     (doseq [[nick karma] sorted-by-karma]
       (println nick karma))))
-
-(-main *command-line-args*)
