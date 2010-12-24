@@ -1,0 +1,18 @@
+# Karmawhore - an IRC karma tracker library #
+
+Usage:
+
+    $ clj karmawhore.clj your-log.file
+
+It generates the histogram to stdout.
+
+## ChangeLog ##
+
+0.1 ("you got something to say you better jump in my face")
+
+  * Initial release
+  * Can parse irssi logfiles
+  * Using immutable data structures now
+  * Rewrote in Clojure
+  * Rewrote in Scheme (Guile)
+  * Rewrote in JavaScript (Gjs)
