@@ -19,7 +19,7 @@
   (:use [clojure.contrib.duck-streams :only (read-lines)])
   (:use [clojure.contrib.generic.functor :only (fmap)]))
 
-(def allowed-nickname "[A-z]{1,16}")
+(def allowed-nickname "[A-~\\d]{1,16}")
 (def nick-plus (re-pattern (format "(%s)\\+\\+" allowed-nickname)))
 (def nick-minus (re-pattern (format "(%s)\\-\\-" allowed-nickname)))
 
