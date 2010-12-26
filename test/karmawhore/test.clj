@@ -27,7 +27,12 @@
 
 (deftest normalize-nicks
   (are [clean dirty] (= clean (normalize-nick dirty))
-    "Leonidas" "Leonidas_"
-    "Leonidas" "Leonidas|away"
-    "Leonidas" "Leonidas`away"
-    "Leonidas" "[Clan]Leonidas"))
+       "Leonidas" "Leonidas"
+       "Leonidas" "Leonidas_"
+       "Leonidas" "Leonidas|away"
+       "Leonidas" "Leonidas`away"
+       "Leonidas" "[Clan]Leonidas"))
+
+(deftest join-nicks-by-regex
+  (are [clean mapping dirty] (= clean (join-nicks mapping dirty))
+       "Leonidas" {"Leonidas" '(#"Leonidas\S*")} "LeonidasFoobar"))
