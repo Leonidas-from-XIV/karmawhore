@@ -26,7 +26,8 @@
   (is nil (match-line "Numbers cannot be upvoted like this: 42++ 23--")))
 
 (deftest normalize-nicks
-  (is "Leonidas" (normalize-nick "Leonidas_"))
-  (is "Leonidas" (normalize-nick "Leonidas|away"))
-  (is "Leonidas" (normalize-nick "Leonidas`away"))
-  (is "Leonidas" (normalize-nick "[Clan]Leonidas")))
+  (are [clean dirty] (= clean (normalize-nick dirty))
+    "Leonidas" "Leonidas_"
+    "Leonidas" "Leonidas|away"
+    "Leonidas" "Leonidas`away"
+    "Leonidas" "[Clan]Leonidas"))
