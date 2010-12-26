@@ -15,5 +15,18 @@
   (is {} (get-downvotes "Everyone is fine")))
 
 (deftest regex-matches
-  (is (["Leonidas++" "Leonidas"] "Simple upvote for Leonidas++"))
-  (is (["Leonidas--" "Leonidas"] "Equally simple Leonidas-- downvote")))
+  (is '(["Leonidas++" "Leonidas"])
+      (match-line "Simple upvote for Leonidas++"))
+  (is '(["Leonidas--" "Leonidas"])
+      (match-line "Equally simple Leonidas-- downvote"))
+  (is '(["Leonidas--" "Leonidas"] ["Leonidas++" "Leonidas"])
+      (match-line "Downvoting Leonidas-- and upvoting Leonidas++ again"))
+  (is nil (match-line "No votes on this line"))
+  (is nil (match-line "No votes+ + on this one either"))
+  (is nil (match-line "Numbers cannot be upvoted like this: 42++ 23--")))
+
+(deftest normalize-nicks
+  (is "Leonidas" (normalize-nick "Leonidas_"))
+  (is "Leonidas" (normalize-nick "Leonidas|away"))
+  (is "Leonidas" (normalize-nick "Leonidas`away"))
+  (is "Leonidas" (normalize-nick "[Clan]Leonidas")))
