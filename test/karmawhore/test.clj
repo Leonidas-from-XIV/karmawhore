@@ -34,5 +34,5 @@
        "Leonidas" "[Clan]Leonidas"))
 
 (deftest join-nicks-by-regex
-  (are [clean mapping dirty] (= clean (join-nicks mapping dirty))
+  (are [clean mapping dirty] (= clean (join-nick mapping dirty))
        "Leonidas" {"Leonidas" '(#"Leonidas\S*")} "LeonidasFoobar"))
