@@ -15,15 +15,16 @@
   (is {} (get-downvotes "Everyone is fine")))
 
 (deftest regex-matches
-  (is '(["Leonidas++" "Leonidas"])
-      (match-line "Simple upvote for Leonidas++"))
-  (is '(["Leonidas--" "Leonidas"])
-      (match-line "Equally simple Leonidas-- downvote"))
-  (is '(["Leonidas--" "Leonidas"] ["Leonidas++" "Leonidas"])
-      (match-line "Downvoting Leonidas-- and upvoting Leonidas++ again"))
-  (is nil (match-line "No votes on this line"))
-  (is nil (match-line "No votes+ + on this one either"))
-  (is nil (match-line "Numbers cannot be upvoted like this: 42++ 23--")))
+  (are [matched line] (= matched (match-line line))
+       '(["Leonidas++" "Leonidas"]) "Simple upvote for Leonidas++"
+       '(["Leonidas--" "Leonidas"]) "Equally simple Leonidas-- downvote"
+       ; two matches: upvote and downvote
+       '(["Leonidas--" "Leonidas"] ["Leonidas++" "Leonidas"])
+       "Downvoting Leonidas-- and upvoting Leonidas++ again"
+       ; no matches
+       nil "No votes on this line"
+       nil "No votes+ + on this one either"
+       nil "Numbers cannot be upvoted like this: 42++ 23--"))
 
 (deftest normalize-nicks
   (are [clean dirty] (= clean (normalize-nick dirty))
