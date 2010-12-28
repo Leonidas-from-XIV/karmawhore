@@ -6,15 +6,19 @@
 ;(def b {"Leonidas" {:upvotes 4 :downvotes 1}})
 ;(merge-with (partial merge-with +) a b)
 (deftest parses-votes
-  (is {"Leonidas" {:upvotes 1 :downvotes 0}}
-      (get-votes "hey, Leondidas++ for writing Karmawhore"))
-  (is {"Leonidas" {:upvotes 2 :downvotes 0}}
-      (get-votes "Leonidas++ gets a lot of karma, Leonidas++"))
-  (is {"Leonidas" {:upvotes 1 :downvotes 0} "Xenefungus" {:upvotes 0 :downvotes 1}}
-      (get-votes "Xenefungus-- gets no karma but Leonidas++ does"))
-  (is {} (get-votes "Noone gets karma"))
-  (is {} (get-votes "URLs like http://in.tum.de/?foo=bar++baz don't have karma"))
-  (is {"Xenefungus" {:upvotes 0 :downvotes 1}} (get-votes "Xenefungus-- uses Windows")))
+  (are [parsed line] (= parsed (get-votes line))
+       {"Leonidas" {:upvotes 1 :downvotes 0}}
+       "hey, Leondidas++ for writing Karmawhore"
+
+       {"Leonidas" {:upvotes 2 :downvotes 0}}
+       "Leonidas++ gets a lot of karma, Leonidas++"
+
+       {"Leonidas" {:upvotes 1 :downvotes 0} "Xenefungus" {:upvotes 0 :downvotes 1}}
+       "Xenefungus-- gets no karma but Leonidas++ does"
+
+       {} "Noone gets karma"
+       {} "URLs like http://in.tum.de/?foo=bar++baz don't have karma"
+       {"Xenefungus" {:upvotes 0 :downvotes 1}} "Xenefungus-- uses Windows"))
 
 (deftest regex-matches
   (are [matched line] (= matched (match-line line))
