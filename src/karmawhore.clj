@@ -23,7 +23,7 @@
 (def allowed-nickname "[A-~\\d]{1,16}")
 (def nick-plus (re-pattern (format "(%s)\\+\\+" allowed-nickname)))
 (def nick-minus (re-pattern (format "(%s)\\-\\-" allowed-nickname)))
-(def nick-vote (re-pattern (format "(%s)(\\-\\-|\\+\\+)" allowed-nickname)))
+(def nick-vote #"([A-~][A-~\d]*)(\-\-|\+\+)")
 
 (defn get-votes [line]
   (let [nicks (map second (re-seq nick-vote line))]
