@@ -43,6 +43,8 @@
                     #"_+$" #"^_+"
                     ; remove stuff in square brackets
                     #"\[.*?\]"
+                    ; remove "appended" shit
+                    #"[`|].*$"
                     )]
     (reduce (fn [n regexp] (re-sub regexp "" n)) nick eliminate)))
 
