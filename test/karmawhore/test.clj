@@ -30,8 +30,12 @@
 
 (deftest normalize-nicks
   (are [clean dirty] (= clean (normalize-nick dirty))
+       ; a "basename" nick should evaluate to itself
        "Leonidas" "Leonidas"
        "Leonidas" "Leonidas_"
+       "Leonidas" "Leonidas__"
+       "Leonidas" "_Leonidas"
+       "Leonidas" "__Leonidas"
        "Leonidas" "Leonidas|away"
        "Leonidas" "Leonidas`away"
        "Leonidas" "[Clan]Leonidas"))

@@ -17,6 +17,7 @@
 (ns karmawhore
   (:gen-class)
   (:use [clojure.contrib.duck-streams :only (read-lines)])
+  (:use [clojure.contrib.str-utils :only (re-sub)])
   (:use [clojure.contrib.generic.functor :only (fmap)]))
 
 (def allowed-nickname "[A-~\\d]{1,16}")
@@ -37,7 +38,13 @@
   (re-seq nick-vote line))
 
 (defn normalize-nick [nick]
-  nick)
+  (let [eliminate '(
+                    ; remove underscores at the beginning and end
+                    #"_+$" #"^_+"
+                    ; remove stuff in square brackets
+                    #"\[.*?\]"
+                    )]
+    (reduce (fn [n regexp] (re-sub regexp "" n)) nick eliminate)))
 
 (defn join-nick [mapping nick]
   nick)
