@@ -36,11 +36,6 @@
             {user {:upvotes (get upvotes user 0)
                    :downvotes (get downvotes user 0)}}))))
 
-(defn get-histogram [line]
-  (let [upvotes (get-votes nick-plus line)
-        downvotes (fmap - (get-votes nick-minus line))]
-    (merge-with + upvotes downvotes)))
-
 (defn match-line [line]
   (re-seq nick-vote line))
 
@@ -60,9 +55,8 @@
 
 (defn -main [& args]
   (let [file-name (first args)
-        histograms (map get-histogram (read-lines file-name))
-        histogram (apply merge-with + histograms)
-        histogram (remove (comp zero? second) histogram)
-        sorted-by-karma (reverse (sort-by second histogram))]
-    (doseq [[nick karma] sorted-by-karma]
-      (println nick karma))))
+        line-votes (map get-votes (read-lines file-name))
+        votes (reduce (fn [a b] (merge-with (partial merge-with +) a b)) line-votes)
+        summed-karma (into {}
+                           (for [[k {u :upvotes d :downvotes}] votes] [k (- u d)]))]
+    (println summed-karma)))
