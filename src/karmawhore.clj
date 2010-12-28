@@ -22,9 +22,10 @@
 (def allowed-nickname "[A-~\\d]{1,16}")
 (def nick-plus (re-pattern (format "(%s)\\+\\+" allowed-nickname)))
 (def nick-minus (re-pattern (format "(%s)\\-\\-" allowed-nickname)))
+(def nick-vote (re-pattern (format "(%s)(\\-\\-|\\+\\+)" allowed-nickname)))
 
-(defn get-votes [regexp line]
-  (let [nicks (map second (re-seq regexp line))]
+(defn get-votes [line]
+  (let [nicks (map second (re-seq nick-vote line))]
     (frequencies nicks)))
 
 (defn get-histogram [line]
@@ -33,7 +34,7 @@
     (merge-with + upvotes downvotes)))
 
 (defn match-line [line]
-  '())
+  (re-seq nick-vote line))
 
 (defn normalize-nick [nick]
   nick)
