@@ -32,11 +32,6 @@
         downvotes (fmap - (get-votes nick-minus line))]
     (merge-with + upvotes downvotes)))
 
-(defn get-upvotes [line]
-  {})
-
-(def get-downvotes get-upvotes)
-
 (defn match-line [line]
   '())
 
