@@ -17,6 +17,7 @@
 (ns karmawhore
   (:gen-class)
   (:use [clojure.contrib.duck-streams :only (read-lines)])
+  (:use [clojure.contrib.seq :only (separate)])
   (:use [clojure.contrib.str-utils :only (re-sub)])
   (:use [clojure.contrib.generic.functor :only (fmap)]))
 
@@ -26,8 +27,14 @@
 (def nick-vote #"([A-~][A-~\d]*)(\-\-|\+\+)")
 
 (defn get-votes [line]
-  (let [nicks (map second (re-seq nick-vote line))]
-    (frequencies nicks)))
+  (let [matches (re-seq nick-vote line)
+        [up down] (separate #(= (nth % 2) "++") matches)
+        upvotes (frequencies (map second up))
+        downvotes (frequencies (map second down))]
+    (into {}
+          (for [user (set (mapcat keys [upvotes downvotes]))]
+            {user {:upvotes (get upvotes user 0)
+                   :downvotes (get downvotes user 0)}}))))
 
 (defn get-histogram [line]
   (let [upvotes (get-votes nick-plus line)

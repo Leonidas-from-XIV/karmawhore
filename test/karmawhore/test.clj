@@ -8,7 +8,7 @@
 (deftest parses-votes
   (are [parsed line] (= parsed (get-votes line))
        {"Leonidas" {:upvotes 1 :downvotes 0}}
-       "hey, Leondidas++ for writing Karmawhore"
+       "hey, Leonidas++ for writing Karmawhore"
 
        {"Leonidas" {:upvotes 2 :downvotes 0}}
        "Leonidas++ gets a lot of karma, Leonidas++"
@@ -46,4 +46,4 @@
 
 (deftest join-nicks-by-regex
   (are [clean mapping dirty] (= clean (join-nick mapping dirty))
-       "Leonidas" {"Leonidas" '(#"Leonidas\S*")} "LeonidasFoobar"))
+       "Leonidas" {"Leonidas" #{#"Leonidas\S*"}} "LeonidasFoobar"))
