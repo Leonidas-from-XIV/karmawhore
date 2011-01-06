@@ -2,13 +2,22 @@
 
 Usage:
 
-    $ lein run -m karmawhore your-log.file
+    $ lein run '"your-log.file"'
 
-It generates the histogram to stdout.
+It generates the histogram to stdout. You need to use this strange quoting
+because of a bug in leiningen, which is fixed in the development version
+already. leiningen > 1.4.1 should work just fine.
 
 ## ChangeLog ##
 
-0.1 ("you got something to say you better jump in my face")
+0.2.0 ("you say party, we say die")
+
+  * Support for up- and downvotes
+  * Added unittests
+  * Added support for leiningen to ease dependency management
+  * Retronamed 0.1 release into 0.1.0
+
+0.1.0 ("you got something to say you better jump in my face")
 
   * Initial release
   * Can parse irssi logfiles
