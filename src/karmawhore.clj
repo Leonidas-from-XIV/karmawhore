@@ -54,8 +54,7 @@
   (let [file-name (first args)
         line-votes (map get-votes (read-lines file-name))
         votes (reduce (fn [a b] (merge-with (partial merge-with +) a b)) line-votes)
-        summed-karma (into {}
-                           (for [[k {u :upvotes d :downvotes}] votes] [k {:upvotes u :downvotes d :sum (- u d)}]))
-        sorted-by-karma (sort-by (comp - :sum val) summed-karma)]
+        summed-karma (for [[k {u :upvotes d :downvotes}] votes] [k {:upvotes u :downvotes d :sum (- u d)}])
+        sorted-by-karma (sort-by (comp - :sum second) summed-karma)]
     (doseq [[nick {u :upvotes d :downvotes s :sum}] sorted-by-karma]
       (printf "%s: Karma %d (Upvotes %d, Downvotes %d)\n" nick s u d))))
