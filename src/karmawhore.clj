@@ -1,5 +1,5 @@
 ;;; Karmawhore - an IRC karma tracker script
-;;; Copyright (C) 2010  Leonidas
+;;; Copyright (C) 2010, 2011  Leonidas
 ;;;
 ;;; This program is free software: you can redistribute it and/or modify
 ;;; it under the terms of the GNU Affero General Public License as published by
@@ -21,9 +21,6 @@
   (:use [clojure.contrib.str-utils :only (re-sub)])
   (:use [clojure.contrib.generic.functor :only (fmap)]))
 
-(def allowed-nickname "[A-~\\d]{1,16}")
-(def nick-plus (re-pattern (format "(%s)\\+\\+" allowed-nickname)))
-(def nick-minus (re-pattern (format "(%s)\\-\\-" allowed-nickname)))
 (def nick-vote #"([A-~][A-~\d]*)(\-\-|\+\+)")
 
 (defn get-votes [line]
@@ -58,5 +55,7 @@
         line-votes (map get-votes (read-lines file-name))
         votes (reduce (fn [a b] (merge-with (partial merge-with +) a b)) line-votes)
         summed-karma (into {}
-                           (for [[k {u :upvotes d :downvotes}] votes] [k (- u d)]))]
-    (println summed-karma)))
+                           (for [[k {u :upvotes d :downvotes}] votes] [k {:upvotes u :downvotes d :sum (- u d)}]))
+        sorted-by-karma (sort-by (comp - :sum val) summed-karma)]
+    (doseq [[nick {u :upvotes d :downvotes s :sum}] sorted-by-karma]
+      (printf "%s: Karma %d (Upvotes %d, Downvotes %d)\n" nick s u d))))
