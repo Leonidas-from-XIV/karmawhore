@@ -48,7 +48,9 @@
     (reduce (fn [n regexp] (re-sub regexp "" n)) nick eliminate)))
 
 (defn join-nick [mapping nick]
-  nick)
+  (let [matches (fn [regexp] (re-matches regexp nick))
+        criterion (fn [[candidate regexps]] (some matches regexps))]
+    (key (first (filter criterion mapping)))))
 
 (defn -main [& args]
   (let [file-name (first args)

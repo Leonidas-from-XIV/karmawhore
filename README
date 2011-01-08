@@ -2,13 +2,17 @@
 
 Usage:
 
-    $ lein run '"your-log.file"'
+    $ lein run your-log.file
 
-It generates the histogram to stdout. You need to use this strange quoting
-because of a bug in leiningen, which is fixed in the development version
-already. leiningen > 1.4.1 should work just fine.
+It generates the histogram to stdout. This requires leiningen >= 1.4.2,
+because of a bugfix made after 1.4.1. Older versions work, but require
+a workaround.
 
 ## ChangeLog ##
+
+0.2.1 ("everything is blue in this world")
+
+  * Support for nick merging using regular expressions
 
 0.2.0 ("you say party, we say die")
 
