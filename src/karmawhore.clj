@@ -83,9 +83,19 @@
 ;; Clojure 1.3 gets released
 (defn load-config []
   (let [conf (try
-               (let [json (read-json (slurp "karmawhore.json"))]
-                 ;; convert items into regexp
-                 (assoc json :blacklist (map re-pattern (json :blacklist))))
+               (let [json (read-json (slurp "karmawhore.json"))
+                     ;; convert items into regexp
+                     processed-blacklist (->>
+                                           (json :blacklist)
+                                           (map re-pattern)
+                                           (assoc json :blacklist))
+                     ;; convert into set of regexp
+                     processed-join (->>
+                                      (processed-blacklist :join)
+                                      (map (fn [[k v]] [(name k) (set (map re-pattern v))]))
+                                      (into {})
+                                      (assoc processed-blacklist :join))]
+                 processed-join)
                (catch java.io.FileNotFoundException e config))]
     conf))
 

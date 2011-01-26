@@ -1,3 +1,7 @@
 {
 	"blacklist" : ["c", "C"]
+	"join" : {
+		"luketheduke" : ["luke.*"],
+		"x127" : [".*127"]
+	}
 }
