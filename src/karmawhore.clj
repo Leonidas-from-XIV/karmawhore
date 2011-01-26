@@ -46,11 +46,17 @@
         joining-fn (partial join-nick mapping)]
     (map joining-fn nick-list)))
 
+(defn- process-matches [match-list]
+  (->> match-list
+    (map second)
+    (join-nick-list)
+    (frequencies)))
+
 (defn get-votes [line]
   (let [matches (re-seq nick-vote line)
         [up down] (separate #(= (nth % 2) "++") matches)
-        upvotes (frequencies (join-nick-list (map second up)))
-        downvotes (frequencies (join-nick-list (map second down)))]
+        upvotes (process-matches up)
+        downvotes (process-matches down)]
     (into {}
           (for [user (set (mapcat keys [upvotes downvotes])) :when (not (blacklisted? user))]
             {user {:upvotes (get upvotes user 0)
