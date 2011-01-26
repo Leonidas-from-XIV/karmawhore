@@ -23,7 +23,9 @@
   (:use [clojure.contrib.json :only (read-json)]))
 
 (def nick-vote #"([A-~][A-~\d]*)(\-\-|\+\+)")
-(def config {})
+;; the default configuration, assumed when no config file was found or
+;; the configuration did not get loaded at all
+(def config {:blacklist []})
 
 (defn get-votes [line]
   (let [matches (re-seq nick-vote line)
@@ -57,13 +59,15 @@
 ;; of course I ran into an error in clojure 1.2 fixed in 1.3
 ;; http://dev.clojure.org/jira/browse/CONTRIB-99
 ;; http://dev.clojure.org/jira/browse/CONTRIB-101
+;; This is why, for now, we only run read-json when the file exists until
+;; Clojure 1.3 gets released
 (defn load-config []
-  (let [default {:blacklist []}
-        content (try
-                  (slurp "karmawhore.json")
-                  (catch java.io.FileNotFoundException e ""))
-        json (read-json content true false default)]
-  (assoc json :blacklist (map re-pattern (json :blacklist)))))
+  (let [conf (try
+               (let [json (read-json (slurp "karmawhore.json"))]
+                 ;; convert items into regexp
+                 (assoc json :blacklist (map re-pattern (json :blacklist))))
+               (catch java.io.FileNotFoundException e config))]
+    conf))
 
 (defn blacklisted? [item]
   (let [blacklist (config :blacklist)
