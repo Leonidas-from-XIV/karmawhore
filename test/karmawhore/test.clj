@@ -21,7 +21,8 @@
        {"Xenefungus" {:upvotes 0 :downvotes 1}} "Xenefungus-- uses Windows"))
 
 (deftest blacklisting-nicks
-  (binding [config {:blacklist [#"Leonidas" #".*enefungus"]}]
+  (binding [config {:blacklist [#"Leonidas" #".*enefungus"]
+                    :join #{}}]
     (are [parsed line] (= parsed (get-votes line))
          {} "Leonidas++ is blacklisted, though"
          {} "Xenefungus++ is also blacklisted"
@@ -31,8 +32,9 @@
          "Edeltraudzombiexenefungus-- gets no karma, larsrh++ does")))
 
 (deftest joining-nicks
-  (binding [config {:join {"Xenefungus" #{#"Zombiexenefungus" #"Edeltraudzombiexenefungus"}
-                           "x127" #{".127"}}}]
+  (binding [config {:blacklist []
+                    :join {"Xenefungus" #{#"Zombiexenefungus" #"Edeltraudzombiexenefungus"}
+                           "x127" #{#".127"}}}]
     (are [parsed line] (= parsed (get-votes line))
          {"Xenefungus" {:upvotes 1 :downvotes 0}}
          "Zombiexenefungus++ gets karma for zombie prefix"
