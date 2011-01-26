@@ -25,7 +25,7 @@
 (def nick-vote #"([A-~][A-~\d]*)(\-\-|\+\+)")
 ;; the default configuration, assumed when no config file was found or
 ;; the configuration did not get loaded at all
-(def config {:blacklist []})
+(def config {:blacklist [] :join {}})
 
 (defn blacklisted? [nick]
   (let [blacklist (config :blacklist)
@@ -34,11 +34,23 @@
         tested (map predicate blacklist)]
     (some true? tested)))
 
+(defn join-nick [mapping nick]
+  (let [matches (fn [regexp] (re-matches regexp nick))
+        criterion (fn [[candidate regexps]] (some matches regexps))
+        possible-nicks (filter criterion mapping)]
+    (if (empty? possible-nicks) nick
+      (key (first possible-nicks)))))
+
+(defn join-nick-list [nick-list]
+  (let [mapping (config :join)
+        joining-fn (partial join-nick mapping)]
+    (map joining-fn nick-list)))
+
 (defn get-votes [line]
   (let [matches (re-seq nick-vote line)
         [up down] (separate #(= (nth % 2) "++") matches)
-        upvotes (frequencies (map second up))
-        downvotes (frequencies (map second down))]
+        upvotes (frequencies (join-nick-list (map second up)))
+        downvotes (frequencies (join-nick-list (map second down)))]
     (into {}
           (for [user (set (mapcat keys [upvotes downvotes])) :when (not (blacklisted? user))]
             {user {:upvotes (get upvotes user 0)
@@ -57,11 +69,6 @@
                     #"[`|].*$"
                     )]
     (reduce (fn [n regexp] (re-sub regexp "" n)) nick eliminate)))
-
-(defn join-nick [mapping nick]
-  (let [matches (fn [regexp] (re-matches regexp nick))
-        criterion (fn [[candidate regexps]] (some matches regexps))]
-    (key (first (filter criterion mapping)))))
 
 ;; of course I ran into an error in clojure 1.2 fixed in 1.3
 ;; http://dev.clojure.org/jira/browse/CONTRIB-99
