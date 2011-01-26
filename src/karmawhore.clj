@@ -16,12 +16,14 @@
 
 (ns karmawhore
   (:gen-class)
-  (:use [clojure.contrib.duck-streams :only (read-lines)])
+  (:use [clojure.contrib.duck-streams :only (read-lines reader)])
   (:use [clojure.contrib.seq :only (separate)])
   (:use [clojure.contrib.str-utils :only (re-sub)])
-  (:use [clojure.contrib.generic.functor :only (fmap)]))
+  (:use [clojure.contrib.generic.functor :only (fmap)])
+  (:use [clojure.contrib.json :only (read-json)]))
 
 (def nick-vote #"([A-~][A-~\d]*)(\-\-|\+\+)")
+(def config {})
 
 (defn get-votes [line]
   (let [matches (re-seq nick-vote line)
@@ -52,11 +54,31 @@
         criterion (fn [[candidate regexps]] (some matches regexps))]
     (key (first (filter criterion mapping)))))
 
+;; of course I ran into an error in clojure 1.2 fixed in 1.3
+;; http://dev.clojure.org/jira/browse/CONTRIB-99
+;; http://dev.clojure.org/jira/browse/CONTRIB-101
+(defn load-config []
+  (let [default {:blacklist []}
+        content (try
+                  (slurp "karmawhore.json")
+                  (catch java.io.FileNotFoundException e ""))
+        json (read-json content true false default)]
+  (assoc json :blacklist (map re-pattern (json :blacklist)))))
+
+(defn blacklisted? [item]
+  (let [blacklist (config :blacklist)
+        ;; convert the matches or non-matches (nil) to true or false
+        predicate #(not (nil? (re-matches % item)))
+        tested (map predicate blacklist)]
+    (some true? tested)))
+
 (defn -main [& args]
-  (let [file-name (first args)
-        line-votes (map get-votes (read-lines file-name))
-        votes (reduce (fn [a b] (merge-with (partial merge-with +) a b)) line-votes)
-        summed-karma (for [[k {u :upvotes d :downvotes}] votes] [k {:upvotes u :downvotes d :sum (- u d)}])
-        sorted-by-karma (sort-by (comp - :sum second) summed-karma)]
-    (doseq [[nick {u :upvotes d :downvotes s :sum}] sorted-by-karma]
-      (printf "%s: Karma %d (Upvotes %d, Downvotes %d)\n" nick s u d))))
+  ;; make the config locally known using dynamic binding
+  (binding [config (load-config)]
+    (let [file-name (first args)
+          line-votes (map get-votes (read-lines file-name))
+          votes (reduce (fn [a b] (merge-with (partial merge-with +) a b)) line-votes)
+          summed-karma (for [[k {u :upvotes d :downvotes}] votes] [k {:upvotes u :downvotes d :sum (- u d)}])
+          sorted-by-karma (sort-by (comp - :sum second) summed-karma)]
+      (doseq [[nick {u :upvotes d :downvotes s :sum}] sorted-by-karma]
+        (printf "%s: Karma %d (Upvotes %d, Downvotes %d)\n" nick s u d)))))

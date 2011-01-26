@@ -13,6 +13,7 @@ a workaround.
 0.2.1 ("everything is blue in this world")
 
   * Support for nick merging using regular expressions
+  * Added a karmawhore.json config file for blacklisting
 
 0.2.0 ("you say party, we say die")
 
