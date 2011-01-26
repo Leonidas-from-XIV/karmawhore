@@ -27,13 +27,20 @@
 ;; the configuration did not get loaded at all
 (def config {:blacklist []})
 
+(defn blacklisted? [nick]
+  (let [blacklist (config :blacklist)
+        ;; convert the matches or non-matches (nil) to true or false
+        predicate #(not (nil? (re-matches % nick)))
+        tested (map predicate blacklist)]
+    (some true? tested)))
+
 (defn get-votes [line]
   (let [matches (re-seq nick-vote line)
         [up down] (separate #(= (nth % 2) "++") matches)
         upvotes (frequencies (map second up))
         downvotes (frequencies (map second down))]
     (into {}
-          (for [user (set (mapcat keys [upvotes downvotes]))]
+          (for [user (set (mapcat keys [upvotes downvotes])) :when (not (blacklisted? user))]
             {user {:upvotes (get upvotes user 0)
                    :downvotes (get downvotes user 0)}}))))
 
@@ -69,19 +76,11 @@
                (catch java.io.FileNotFoundException e config))]
     conf))
 
-(defn blacklisted? [item]
-  (let [blacklist (config :blacklist)
-        ;; convert the matches or non-matches (nil) to true or false
-        predicate #(not (nil? (re-matches % item)))
-        tested (map predicate blacklist)]
-    (some true? tested)))
-
 (defn -main [& args]
   ;; make the config locally known using dynamic binding
   (binding [config (load-config)]
     (let [file-name (first args)
-          get-votes-and-filter #(->> % (get-votes) (remove (comp blacklisted? key)) (into {}))
-          line-votes (map get-votes-and-filter (read-lines file-name))
+          line-votes (map get-votes (read-lines file-name))
           votes (reduce (fn [a b] (merge-with (partial merge-with +) a b)) line-votes)
           summed-karma (for [[k {u :upvotes d :downvotes}] votes] [k {:upvotes u :downvotes d :sum (- u d)}])
           sorted-by-karma (sort-by (comp - :sum second) summed-karma)]
