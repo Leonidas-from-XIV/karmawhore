@@ -76,7 +76,8 @@
   ;; make the config locally known using dynamic binding
   (binding [config (load-config)]
     (let [file-name (first args)
-          line-votes (map get-votes (read-lines file-name))
+          get-votes-and-filter (fn [line] (into {} (remove (fn [[k v]] (blacklisted? k)) (get-votes line))))
+          line-votes (map get-votes-and-filter (read-lines file-name))
           votes (reduce (fn [a b] (merge-with (partial merge-with +) a b)) line-votes)
           summed-karma (for [[k {u :upvotes d :downvotes}] votes] [k {:upvotes u :downvotes d :sum (- u d)}])
           sorted-by-karma (sort-by (comp - :sum second) summed-karma)]
