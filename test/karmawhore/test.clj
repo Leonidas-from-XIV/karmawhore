@@ -20,6 +20,16 @@
        {} "URLs like http://in.tum.de/?foo=bar++baz don't have karma"
        {"Xenefungus" {:upvotes 0 :downvotes 1}} "Xenefungus-- uses Windows"))
 
+(deftest blacklisting-nicks
+  (binding [config {:blacklist [#"Leonidas" #".*enefungus"]}]
+    (are [parsed line] (= parsed (get-votes line))
+         {} "Leonidas++ is blacklisted, though"
+         {} "Xenefungus++ is also blacklisted"
+         {} "Zombiexenefungus-- wouldn't get any karma"
+
+         {"larsrh" {:upvotes 1 :downvotes 0}}
+         "Edeltraudzombiexenefungus-- gets no karma, larsrh++ does")))
+
 (deftest regex-matches
   (are [matched line] (= matched (match-line line))
        '(["Leonidas++" "Leonidas" "++"]) "Simple upvote for Leonidas++"
