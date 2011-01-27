@@ -14,13 +14,14 @@
 ;;; You should have received a copy of the GNU Affero General Public License
 ;;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns karmawhore
+(ns karmawhore.parser
   (:gen-class)
   (:use [clojure.contrib.duck-streams :only (read-lines reader)])
   (:use [clojure.contrib.seq :only (separate)])
   (:use [clojure.contrib.str-utils :only (re-sub)])
   (:use [clojure.contrib.generic.functor :only (fmap)])
-  (:use [clojure.contrib.json :only (read-json)]))
+  (:use [clojure.contrib.json :only (read-json)])
+  (:use [karmawhore.color :only (bold red white green)]))
 
 (def nick-vote #"(^|\s)([A-~][A-~\d]*)(\-\-|\+\+)")
 ;; the default configuration, assumed when no config file was found or
@@ -113,4 +114,5 @@
           summed-karma (for [[k {u :upvotes d :downvotes}] votes] [k {:upvotes u :downvotes d :sum (- u d)}])
           sorted-by-karma (sort-by (comp - :sum second) summed-karma)]
       (doseq [[nick {u :upvotes d :downvotes s :sum}] sorted-by-karma]
-        (printf "%s: Karma %d (Upvotes %d, Downvotes %d)\n" nick s u d)))))
+        (printf "%s: Karma %s (Upvotes %s, Downvotes %s)\n"
+                (white nick) (bold (white s)) (green u) (red d))))))

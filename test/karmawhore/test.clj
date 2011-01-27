@@ -1,5 +1,5 @@
 (ns karmawhore.test
-  (:use [karmawhore] :reload)
+  (:use [karmawhore.parser] :reload)
   (:use [clojure.test]))
 
 ;(def a {"Leonidas" {:upvotes 1 :downvotes 2}})
