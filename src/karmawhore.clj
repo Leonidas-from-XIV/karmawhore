@@ -46,10 +46,23 @@
         joining-fn (partial join-nick mapping)]
     (map joining-fn nick-list)))
 
+(defn normalize-nick [nick]
+  (let [eliminate '(
+                    ; remove underscores at the beginning and end
+                    #"_+$" #"^_+"
+                    ; remove stuff in square brackets
+                    #"\[.*?\]"
+                    ; remove "appended" shit
+                    #"[`|].*$"
+                    )]
+    (reduce (fn [n regexp] (re-sub regexp "" n)) nick eliminate)))
+
 (defn- process-matches [match-list]
   (->> match-list
     (map first)
     (join-nick-list)
+    (map normalize-nick)
+    (remove blacklisted?)
     (frequencies)))
 
 (defn match-line [line]
@@ -64,20 +77,9 @@
         upvotes (process-matches up)
         downvotes (process-matches down)]
     (into {}
-          (for [user (set (mapcat keys [upvotes downvotes])) :when (not (blacklisted? user))]
+          (for [user (set (mapcat keys [upvotes downvotes]))]
             {user {:upvotes (get upvotes user 0)
                    :downvotes (get downvotes user 0)}}))))
-
-(defn normalize-nick [nick]
-  (let [eliminate '(
-                    ; remove underscores at the beginning and end
-                    #"_+$" #"^_+"
-                    ; remove stuff in square brackets
-                    #"\[.*?\]"
-                    ; remove "appended" shit
-                    #"[`|].*$"
-                    )]
-    (reduce (fn [n regexp] (re-sub regexp "" n)) nick eliminate)))
 
 ;; of course I ran into an error in clojure 1.2 fixed in 1.3
 ;; http://dev.clojure.org/jira/browse/CONTRIB-99
