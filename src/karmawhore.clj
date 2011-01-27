@@ -22,7 +22,7 @@
   (:use [clojure.contrib.generic.functor :only (fmap)])
   (:use [clojure.contrib.json :only (read-json)]))
 
-(def nick-vote #"([A-~][A-~\d]*)(\-\-|\+\+)")
+(def nick-vote #"(^|\s)([A-~][A-~\d]*)(\-\-|\+\+)")
 ;; the default configuration, assumed when no config file was found or
 ;; the configuration did not get loaded at all
 (def config {:blacklist [] :join {}})
@@ -48,13 +48,13 @@
 
 (defn- process-matches [match-list]
   (->> match-list
-    (map second)
+    (map #(nth % 2))
     (join-nick-list)
     (frequencies)))
 
 (defn get-votes [line]
   (let [matches (re-seq nick-vote line)
-        [up down] (separate #(= (nth % 2) "++") matches)
+        [up down] (separate #(= (nth % 3) "++") matches)
         upvotes (process-matches up)
         downvotes (process-matches down)]
     (into {}

@@ -48,12 +48,14 @@
          {"x127" {:upvotes 1 :downvotes 1}}
          "x127++ for short nick, {127-- for two nicks in channel")))
 
+;; this test might be a bit too implementation specific, the regex-matcher
+;; should only output relevant stuff
 (deftest regex-matches
   (are [matched line] (= matched (match-line line))
-       '(["Leonidas++" "Leonidas" "++"]) "Simple upvote for Leonidas++"
-       '(["Leonidas--" "Leonidas" "--"]) "Equally simple Leonidas-- downvote"
+       '([" Leonidas++" " " "Leonidas" "++"]) "Simple upvote for Leonidas++"
+       '([" Leonidas--" " " "Leonidas" "--"]) "Equally simple Leonidas-- downvote"
        ; two matches: upvote and downvote
-       '(["Leonidas--" "Leonidas" "--"] ["Leonidas++" "Leonidas" "++"])
+       '([" Leonidas--" " " "Leonidas" "--"] [" Leonidas++" " " "Leonidas" "++"])
        "Downvoting Leonidas-- and upvoting Leonidas++ again"
        ; no matches
        nil "No votes on this line"

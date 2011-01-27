@@ -10,6 +10,10 @@ a workaround.
 
 ## ChangeLog ##
 
+0.2.2 ("we're rocking in our reclining chairs")
+
+  * Improved nick matching, unittests pass now completely
+
 0.2.1 ("everything is blue in this world")
 
   * Support for nick merging using regular expressions
