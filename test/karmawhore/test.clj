@@ -48,6 +48,17 @@
          {"x127" {:upvotes 1 :downvotes 1}}
          "x127++ for short nick, {127-- for two nicks in channel")))
 
+(deftest normalize-join-blacklist-nicks
+  (binding [config {:blacklist [#"Leonidas", #"Xenefungus"]
+                    :join {"Xenefungus" #{#".*enefungus"}}}]
+    (are [parsed line] (= parsed (get-votes line))
+         {} "Leonidas++ is directly in the blacklist"
+         {} "Leonidas_++ is only normalized in the blacklist"
+         {} "Zombiexenefungus-- is not, but the joined version is"
+
+         {"x127" {:upvotes 1 :downvotes 0}}
+         "Leonidas|away-- is indirectly blocklisted, x127++ not")))
+
 ;; this test might be a bit too implementation specific, the regex-matcher
 ;; should only output relevant stuff
 (deftest regex-matches
