@@ -8,11 +8,21 @@ It generates the histogram to stdout. This requires leiningen >= 1.4.2,
 because of a bugfix made after 1.4.1. Older versions work, but require
 a workaround.
 
+If you are curious, you can also run the unittests by issuing the
+
+    $ lein test
+
+command, which runs karmawhore on a self-test mode checking the
+features. Don't worry when some fail, releases should be working
+just fine. It is mostly a developer-thingie.
+
 ## ChangeLog ##
 
 0.2.2 ("we're rocking in our reclining chairs")
 
   * Improved nick matching, unittests pass now completely
+  * Implemented nick normalization, so underscores and similar should
+    get folded into the same base nick
 
 0.2.1 ("everything is blue in this world")
 
