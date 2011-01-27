@@ -2,6 +2,10 @@
 	"blacklist" : ["c", "C"]
 	"join" : {
 		"luketheduke" : ["luke.*"],
-		"x127" : [".*127"]
+		"x127" : [".*127"],
+		"ThreeOfEight" : ["threeofeight", "ThreeOf.*"],
+		"corny" : ["crony"],
+		"Georgey" : ["Georgey\\d"],
+		"larsrh" : ["Lars"]
 	}
 }
