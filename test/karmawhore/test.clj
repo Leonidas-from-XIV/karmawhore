@@ -52,10 +52,10 @@
 ;; should only output relevant stuff
 (deftest regex-matches
   (are [matched line] (= matched (match-line line))
-       '([" Leonidas++" " " "Leonidas" "++"]) "Simple upvote for Leonidas++"
-       '([" Leonidas--" " " "Leonidas" "--"]) "Equally simple Leonidas-- downvote"
+       '(["Leonidas" "++"]) "Simple upvote for Leonidas++"
+       '(["Leonidas" "--"]) "Equally simple Leonidas-- downvote"
        ; two matches: upvote and downvote
-       '([" Leonidas--" " " "Leonidas" "--"] [" Leonidas++" " " "Leonidas" "++"])
+       '(["Leonidas" "--"] ["Leonidas" "++"])
        "Downvoting Leonidas-- and upvoting Leonidas++ again"
        ; no matches
        nil "No votes on this line"

@@ -48,22 +48,25 @@
 
 (defn- process-matches [match-list]
   (->> match-list
-    (map #(nth % 2))
+    (map first)
     (join-nick-list)
     (frequencies)))
 
+(defn match-line [line]
+  (let [result (re-seq nick-vote line)]
+    (if (nil? result) nil
+      ;; drop the first two elements, because they contain useless groups
+      (map (partial drop 2) result))))
+
 (defn get-votes [line]
-  (let [matches (re-seq nick-vote line)
-        [up down] (separate #(= (nth % 3) "++") matches)
+  (let [matches (match-line line)
+        [up down] (separate #(= (second %) "++") matches)
         upvotes (process-matches up)
         downvotes (process-matches down)]
     (into {}
           (for [user (set (mapcat keys [upvotes downvotes])) :when (not (blacklisted? user))]
             {user {:upvotes (get upvotes user 0)
                    :downvotes (get downvotes user 0)}}))))
-
-(defn match-line [line]
-  (re-seq nick-vote line))
 
 (defn normalize-nick [nick]
   (let [eliminate '(
