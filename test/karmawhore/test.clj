@@ -57,7 +57,13 @@
          {} "Zombiexenefungus-- is not, but the joined version is"
 
          {"x127" {:upvotes 1 :downvotes 0}}
-         "Leonidas|away-- is indirectly blocklisted, x127++ not")))
+         "Leonidas|away-- is indirectly blocklisted, x127++ not"
+
+         {"x127" {:upvotes 0 :downvotes 1}}
+         "x127|away-- for using away-nicks"
+
+         {"x127" {:upvotes 2 :downvotes 1}}
+         "x127_++ with postfix, _x127-- with prefix, _x127_++ with both")))
 
 ;; this test might be a bit too implementation specific, the regex-matcher
 ;; should only output relevant stuff
