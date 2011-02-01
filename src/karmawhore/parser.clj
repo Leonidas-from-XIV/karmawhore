@@ -22,7 +22,7 @@
   (:use [clojure.contrib.generic.functor :only (fmap)])
   (:use [clojure.contrib.json :only (read-json)])
   (:use [clojure.contrib.command-line :only (with-command-line)])
-  (:use [karmawhore.color :only (bold red white green)])
+  (:use [karmawhore.color :only (bold red white green *force-color*)])
   (:use [karmawhore.html :only (records->html)]))
 
 (def nick-vote #"(^|\s)([A-~][A-~\d]*)(\-\-|\+\+)")
@@ -89,7 +89,7 @@
 ;; http://dev.clojure.org/jira/browse/CONTRIB-101
 ;; This is why, for now, we only run read-json when the file exists until
 ;; Clojure 1.3 gets released
-(defn load-config []
+(defn load-config [overrides]
   (let [conf (try
                (let [json (read-json (slurp "karmawhore.json"))
                      ;; convert items into regexp
@@ -105,12 +105,16 @@
                                       (assoc processed-blacklist :join))]
                  processed-join)
                (catch java.io.FileNotFoundException e config))]
-    (into config conf)))
+    ;; merge the loaded data with the application defaults and any specified overrides
+    (-> config
+      (into conf)
+      (into overrides))))
 
 (defn- text-output [records]
-  (doseq [[nick {u :upvotes d :downvotes s :sum}] records]
-    (printf "%s: Karma %s (Upvotes %s, Downvotes %s)\n"
-            (white nick) (bold (white s)) (green u) (red d))))
+  (binding [*force-color* (config :color)]
+    (doseq [[nick {u :upvotes d :downvotes s :sum}] records]
+      (printf "%s: Karma %s (Upvotes %s, Downvotes %s)\n"
+              (white nick) (bold (white s)) (green u) (red d)))))
 
 (defn- html-output [records]
   (println (records->html records)))
@@ -118,11 +122,11 @@
 (defn -main [& args]
   (with-command-line
     args "Usage: karmawhore [-c|-h] logfile"
-    [[color? c? "Use colored output" false]
+    [[color? c? "Force colored output" false]
      [html? "Output HTML file" false]
      rest-args]
     ;; make the config locally known using dynamic binding
-    (binding [config (load-config)]
+    (binding [config (load-config {:color color?})]
       (let [file-name (first rest-args)
             line-votes (map get-votes (read-lines file-name))
             votes (reduce (fn [a b] (merge-with (partial merge-with +) a b)) line-votes)

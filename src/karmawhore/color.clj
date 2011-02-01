@@ -1,6 +1,10 @@
 (ns karmawhore.color
   (:use [clojure.contrib.str-utils :only (str-join)]))
 
+;; sometimes we want to override the TTY detection
+(def *force-color* false)
+
+;; template that will be filled in with the appropriate color values
 (def sgr-template "\u001b[%dm")
 
 (def sgr-colors
@@ -22,8 +26,8 @@
 
 (defn- fill-color [color]
   ;; only colorize when a TTY is connected
-  (if (not is-a-tty?) ""
-    (format sgr-template (sgr-colors color))))
+  (if (or is-a-tty? *force-color*) (format sgr-template (sgr-colors color))
+    ""))
 
 (defn colorize [color text]
   (let [color (fill-color color)
