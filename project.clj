@@ -1,4 +1,4 @@
-(defproject karmawhore "0.2.4"
+(defproject karmawhore "0.2.5"
   :description "Karma tracker for IRC channels"
   :main karmawhore.parser
   :dependencies [[org.clojure/clojure "1.2.0"]
