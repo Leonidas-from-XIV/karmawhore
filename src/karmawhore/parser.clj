@@ -27,7 +27,7 @@
 (def nick-vote #"(^|\s)([A-~][A-~\d]*)(\-\-|\+\+)")
 ;; the default configuration, assumed when no config file was found or
 ;; the configuration did not get loaded at all
-(def config {:blacklist [] :join {}})
+(def config {:blacklist [] :join {} :color false})
 
 (defn blacklisted? [nick]
   (let [blacklist (config :blacklist)
@@ -104,7 +104,7 @@
                                       (assoc processed-blacklist :join))]
                  processed-join)
                (catch java.io.FileNotFoundException e config))]
-    conf))
+    (into config conf)))
 
 (defn -main [& args]
   ;; make the config locally known using dynamic binding
