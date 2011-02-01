@@ -1,27 +1,40 @@
 # Karmawhore - an IRC karma tracker library #
 
-Usage:
+## Requirements ##
 
-    $ lein run your-log.file
+  * leiningen >= 1.4.2
+  * Java >= 1.6
 
-It generates the histogram to stdout. This requires leiningen >= 1.4.2,
-because of a bugfix made after 1.4.1. Older versions work, but require
-a workaround.
+Yes, that is all. leiningen can download all dependencies and set up everything
+properly.
+
+## Usage ##
+
+    $ lein run [--color] [--html] your-log.file
+
+In the default mode, it generates the distogram to stdout in a text format. It
+tries to detect whether it is running an a console and colorizes the output. It
+is also possible to force the output of colors using a switch.
+
+HTML output is also supported. In that case the color setting will be ignored
+and a HTML file will be output to stdout. Karmawhore ships with a CSS file that
+you might want to use, but everyone is free to roll his own styles.
 
 If you are curious, you can also run the unittests by issuing the
 
     $ lein test
 
-command, which runs karmawhore on a self-test mode checking the
-features. Don't worry when some fail, releases should be working
-just fine. It is mostly a developer-thingie.
+command, which runs karmawhore on a self-test mode checking the features. Don't
+worry when some fail, releases should be working just fine. It is mostly a
+developer-thingie.
 
 ## ChangeLog ##
 
-0.2.4 ("tancz glupia tancz")
+0.2.4 ("tańcz głupia tańcz")
 
-  * Implemented HTML output
+  * Implemented HTML output + CSS file
   * Added command line argument parsing
+  * Colors can get forced on the command line
 
 0.2.3 ("and all you create, and all you destroy")
 
