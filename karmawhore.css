@@ -1,0 +1,51 @@
+/*
+ * Karmawhore default stylesheet
+ * Adapted from pisg
+ */
+
+body {
+  background-color: #DEDEEE;
+  font-family: Verdana, Arial, sans-serif;
+}
+
+td {
+  background-color: #BBBBDB;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  padding-top: 0.1em;
+  padding-bottom: 0.1em;
+}
+
+th {
+  background-color: #C8C8DD;
+}
+
+h2 {
+  border: 1px solid black;
+  background-color: #666699;
+  color: white;
+  font-size: 13pt;
+  text-align: center;
+}
+
+p {
+  margin-left: auto;
+  margin-right: auto;
+  width: 250px;
+}
+
+.upvotes, .downvotes, .sum {
+  text-align: right;
+}
+
+.upvotes {
+  background-color: #66FF33;
+}
+
+.downvotes {
+  background-color: #CC3333;
+}
+
+#powered-by {
+  font-size: x-small;
+}
