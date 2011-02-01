@@ -21,7 +21,8 @@
   (:use [clojure.contrib.str-utils :only (re-sub)])
   (:use [clojure.contrib.generic.functor :only (fmap)])
   (:use [clojure.contrib.json :only (read-json)])
-  (:use [karmawhore.color :only (bold red white green)]))
+  (:use [karmawhore.color :only (bold red white green)])
+  (:use [karmawhore.html :only (records->html)]))
 
 (def nick-vote #"(^|\s)([A-~][A-~\d]*)(\-\-|\+\+)")
 ;; the default configuration, assumed when no config file was found or
