@@ -28,10 +28,10 @@
 (def nick-vote #"(^|\s)([A-~][A-~\d]*)(\-\-|\+\+)")
 ;; the default configuration, assumed when no config file was found or
 ;; the configuration did not get loaded at all
-(def config {:blacklist [] :join {} :color false})
+(def ^{:dynamic true} *config* {:blacklist [] :join {} :color false})
 
 (defn blacklisted? [nick]
-  (let [blacklist (config :blacklist)
+  (let [blacklist (*config* :blacklist)
         ;; convert the matches or non-matches (nil) to true or false
         predicate #(not (nil? (re-matches % nick)))
         tested (map predicate blacklist)]
@@ -45,7 +45,7 @@
       (key (first possible-nicks)))))
 
 (defn join-nick-list [nick-list]
-  (let [mapping (config :join)
+  (let [mapping (*config* :join)
         joining-fn (partial join-nick mapping)]
     (map joining-fn nick-list)))
 
@@ -104,14 +104,14 @@
                                       (into {})
                                       (assoc processed-blacklist :join))]
                  processed-join)
-               (catch java.io.FileNotFoundException e config))]
+               (catch java.io.FileNotFoundException e *config*))]
     ;; merge the loaded data with the application defaults and any specified overrides
-    (-> config
+    (-> *config*
       (into conf)
       (into overrides))))
 
 (defn- text-output [records]
-  (binding [*force-color* (config :color)]
+  (binding [*force-color* (*config* :color)]
     (doseq [[nick {u :upvotes d :downvotes s :sum}] records]
       (printf "%s: Karma %s (Upvotes %s, Downvotes %s)\n"
               (white nick) (bold (white s)) (green u) (red d)))))
@@ -126,7 +126,7 @@
      [html? "Output HTML file" false]
      rest-args]
     ;; make the config locally known using dynamic binding
-    (binding [config (load-config {:color color?})]
+    (binding [*config* (load-config {:color color?})]
       (let [file-name (first rest-args)
             line-votes (map get-votes (read-lines file-name))
             votes (reduce (fn [a b] (merge-with (partial merge-with +) a b)) line-votes)

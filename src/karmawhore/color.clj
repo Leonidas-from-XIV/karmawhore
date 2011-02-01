@@ -2,7 +2,7 @@
   (:use [clojure.contrib.str-utils :only (str-join)]))
 
 ;; sometimes we want to override the TTY detection
-(def *force-color* false)
+(def ^{:dynamic true} *force-color* false)
 
 ;; template that will be filled in with the appropriate color values
 (def sgr-template "\u001b[%dm")
