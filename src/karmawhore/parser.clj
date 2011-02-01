@@ -21,6 +21,7 @@
   (:use [clojure.contrib.str-utils :only (re-sub)])
   (:use [clojure.contrib.generic.functor :only (fmap)])
   (:use [clojure.contrib.json :only (read-json)])
+  (:use [clojure.contrib.command-line :only (with-command-line)])
   (:use [karmawhore.color :only (bold red white green)])
   (:use [karmawhore.html :only (records->html)]))
 
@@ -106,14 +107,26 @@
                (catch java.io.FileNotFoundException e config))]
     (into config conf)))
 
+(defn- text-output [records]
+  (doseq [[nick {u :upvotes d :downvotes s :sum}] records]
+    (printf "%s: Karma %s (Upvotes %s, Downvotes %s)\n"
+            (white nick) (bold (white s)) (green u) (red d))))
+
+(defn- html-output [records]
+  (println (records->html records)))
+
 (defn -main [& args]
-  ;; make the config locally known using dynamic binding
-  (binding [config (load-config)]
-    (let [file-name (first args)
-          line-votes (map get-votes (read-lines file-name))
-          votes (reduce (fn [a b] (merge-with (partial merge-with +) a b)) line-votes)
-          summed-karma (for [[k {u :upvotes d :downvotes}] votes] [k {:upvotes u :downvotes d :sum (- u d)}])
-          sorted-by-karma (sort-by (comp - :sum second) summed-karma)]
-      (doseq [[nick {u :upvotes d :downvotes s :sum}] sorted-by-karma]
-        (printf "%s: Karma %s (Upvotes %s, Downvotes %s)\n"
-                (white nick) (bold (white s)) (green u) (red d))))))
+  (with-command-line
+    args "Usage: karmawhore [-c|-h] logfile"
+    [[color? c? "Use colored output" false]
+     [html? "Output HTML file" false]
+     rest-args]
+    ;; make the config locally known using dynamic binding
+    (binding [config (load-config)]
+      (let [file-name (first rest-args)
+            line-votes (map get-votes (read-lines file-name))
+            votes (reduce (fn [a b] (merge-with (partial merge-with +) a b)) line-votes)
+            summed-karma (for [[k {u :upvotes d :downvotes}] votes]
+                           [k {:upvotes u :downvotes d :sum (- u d)}])
+            sorted-by-karma (sort-by (comp - :sum second) summed-karma)]
+        ((if html? html-output text-output) sorted-by-karma)))))
